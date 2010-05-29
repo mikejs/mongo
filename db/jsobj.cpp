@@ -303,6 +303,8 @@ namespace mongo {
                 return BSONObj::opALL;
             else if ( fn[1] == 's' && fn[2] == 'i' && fn[3] == 'z' && fn[4] == 'e' && fn[5] == 0 )
                 return BSONObj::opSIZE;
+            else if ( fn[1] == 's' && fn[2] == 'u' && fn[3] == 'b' && fn[4] == 's' && fn[5] == 'e' && fn[6] == 't' && fn[7] == 0)
+                return BSONObj::opSUBSET;
             else if ( fn[1] == 'e' ){
                 if ( fn[2] == 'x' && fn[3] == 'i' && fn[4] == 's' && fn[5] == 't' && fn[6] == 's' && fn[7] == 0 )
                     return BSONObj::opEXISTS;

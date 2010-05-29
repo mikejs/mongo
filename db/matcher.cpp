@@ -196,6 +196,7 @@ namespace mongo {
             }
             case BSONObj::opALL:
                 all = true;
+            case BSONObj::opSUBSET:
             case BSONObj::opIN:
                 uassert( 13276 , "$in needs an array" , fe.isABSONObj() );
                 basics.push_back( ElementMatcher( e , op , fe.embeddedObject(), isNot ) );
@@ -562,6 +563,30 @@ namespace mongo {
             
             return 1;
         } // end opALL
+
+        if (compareOp == BSONObj::opSUBSET) {
+            BSONObjSetDefaultOrder actualKeys;
+            IndexSpec( BSON( fieldName << 1 ) ).getKeys( obj, actualKeys );
+            if (actualKeys.size() == 0)
+                return -1;
+
+            if (actualKeys.size() == 1 && actualKeys.begin()->firstElement().isNull())
+                return -1;
+
+            size_t total = 0;
+            for (set<BSONElement, element_lt>::const_iterator i = em.myset->begin(); i != em.myset->end(); ++i) {
+                if (i->type() == jstNULL) {
+                    continue;
+                }
+                BSONObjBuilder b;
+                b.appendAs(*i, "");
+                total += actualKeys.count(b.done());
+            }
+
+            if (total == actualKeys.size())
+                return 1;
+            return -1;
+        }
         
         if ( compareOp == BSONObj::NE )
             return matchesNe( fieldName, toMatch, obj, em , details );
